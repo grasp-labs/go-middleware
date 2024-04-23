@@ -61,7 +61,7 @@ func NewCustomContextMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 			return fmt.Errorf("failed to cast claims as jwt.JWTClaims")
 		}
 
-		reqID := c.Request().Header.Get("Request-ID")
+		reqID := c.Response().Header().Get("X-Request-Id")
 		if reqID == "" {
 			return fmt.Errorf("failed to get Request-ID from header")
 		}

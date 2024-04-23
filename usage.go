@@ -23,7 +23,7 @@ type UsageConfig struct {
 func UsageWithConfig(ctx context.Context, cfg UsageConfig, queueName ...string) echo.MiddlewareFunc {
 	sqsQueueName := ""
 	switch os.Getenv("BUILDING_MODE") {
-	case "tests":
+	case "test":
 		sqsQueueName = "daas-service-cost-handler-usage-queue-test"
 	case "dev":
 		sqsQueueName = "daas-service-cost-handler-usage-queue-dev"

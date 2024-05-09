@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"net/http"
 	"time"
 
 	"github.com/google/uuid"
@@ -46,7 +47,7 @@ func toMiddleware(dynamo dynamodb.ClientDynamoDB, table string) (echo.Middleware
 		return func(c echo.Context) error {
 			cc, ok := c.(*Context)
 			if !ok {
-				return fmt.Errorf("cannot parse context to custom context")
+				return echo.NewHTTPError(http.StatusInternalServerError, fmt.Errorf("cannot cast context to custom context"))
 			}
 
 			startTime := time.Now()

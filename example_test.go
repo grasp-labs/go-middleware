@@ -127,3 +127,27 @@ func ExampleUsageWithConfig() {
 	// Output:
 	// hello world
 }
+
+func ExamplePermissionFilterWithConfig() {
+	// Create server
+	e := echo.New()
+
+	// Echo middlewares
+	e.Use(echomiddleware.Logger())
+	e.Use(echomiddleware.Recover())
+
+	e.Use(middleware.PermissionFilterWithConfig(middleware.PermissionFilterConfig{
+		Roles: []string{"service.workflow.user", "service.workflow.admin"},
+	}))
+
+	e.GET("/", func(c echo.Context) error {
+		return c.JSON(http.StatusOK, "hello world")
+	})
+
+	if err := e.Start(":8080"); !errors.Is(err, http.ErrServerClosed) {
+		log.Fatal(err)
+	}
+
+	// Output:
+	// hello world
+}

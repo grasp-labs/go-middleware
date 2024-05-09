@@ -139,7 +139,7 @@ func TestNewCustomContextMiddleware(t *testing.T) {
 			req := httptest.NewRequest(http.MethodGet, "/", nil)
 			rec := httptest.NewRecorder()
 
-			req.Header.Set("Request-ID", tt.requestID)
+			rec.Header().Set("X-Request-Id", tt.requestID)
 			ctx := e.NewContext(req, rec)
 
 			ctx.Set("user", tt.jwtToken)

@@ -3,6 +3,7 @@ package middleware
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"os"
 	"time"
 
@@ -60,7 +61,7 @@ func (c *UsageConfig) toMiddleware(sqsClient sqs.ClientSqs) (echo.MiddlewareFunc
 		return func(ctx echo.Context) error {
 			cc, ok := ctx.(*Context)
 			if !ok {
-				return fmt.Errorf("cannot cast context to custom context")
+				return echo.NewHTTPError(http.StatusInternalServerError, fmt.Errorf("cannot cast context to custom context"))
 			}
 
 			startTime := time.Now()

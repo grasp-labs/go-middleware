@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.1.1 - 2024-05-10
+
+### Fixes
+
+* Permission filter: add url as optional field for better testing purposes
+
 ## v1.1.0 - 2024-05-09
 
 ### Fixes

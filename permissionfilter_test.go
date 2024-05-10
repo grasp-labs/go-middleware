@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"net"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -9,8 +8,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 )
-
-const testURL = "127.0.0.1:5171"
 
 func TestPermissionFilterConfig_toMiddleware(t *testing.T) {
 	type fields struct {
@@ -81,18 +78,21 @@ func TestPermissionFilterConfig_toMiddleware(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cfg := &PermissionFilterConfig{Roles: tt.fields.Roles}
-			h, err := cfg.toMiddleware()
-			if err != nil {
-				assert.EqualError(t, err, tt.wantErr)
-				return
-			}
-
 			ts, err := setupTestServer(tt.testHttpHandler)
 			if !assert.NoError(t, err) {
 				return
 			}
 			defer ts.Close()
+
+			cfg := &PermissionFilterConfig{
+				Roles: tt.fields.Roles,
+				Url:   ts.URL,
+			}
+			h, err := cfg.toMiddleware()
+			if err != nil {
+				assert.EqualError(t, err, tt.wantErr)
+				return
+			}
 
 			e := echo.New()
 
@@ -116,14 +116,7 @@ func TestPermissionFilterConfig_toMiddleware(t *testing.T) {
 }
 
 func setupTestServer(handler http.Handler) (*httptest.Server, error) {
-	ts := httptest.NewUnstartedServer(handler)
-	l, err := net.Listen("tcp", testURL)
-	if err != nil {
-		return nil, err
-	}
-	ts.Listener.Close()
-	ts.Listener = l
+	ts := httptest.NewServer(handler)
 
-	ts.Start()
 	return ts, nil
 }

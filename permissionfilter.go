@@ -12,12 +12,22 @@ import (
 var defaultRoles = []string{"service.workflow.user", "service.workflow.admin"}
 
 type PermissionFilterConfig struct {
-	Roles []string
+	Roles []string // Optional
+	Url   string   // Optional
 }
 
 func PermissionFilterWithConfig(cfg PermissionFilterConfig) echo.MiddlewareFunc {
 	if len(cfg.Roles) == 0 {
 		cfg.Roles = defaultRoles
+	}
+
+	if cfg.Url == "" {
+		switch os.Getenv("BUILDING_MODE") {
+		case "dev":
+			cfg.Url = "https://grasp-daas.com/api/entitlements-dev/v1/groups/"
+		case "prod":
+			cfg.Url = "https://grasp-daas.com/api/entitlements/v1/groups/"
+		}
 	}
 
 	mw, err := cfg.toMiddleware()
@@ -36,15 +46,7 @@ func (p *PermissionFilterConfig) toMiddleware() (echo.MiddlewareFunc, error) {
 				return echo.NewHTTPError(http.StatusInternalServerError, fmt.Errorf("cannot cast context to custom context"))
 			}
 
-			url := "https://grasp-daas.com/api/entitlements-dev/v1/groups/"
-			switch os.Getenv("BUILDING_MODE") {
-			case "test":
-				url = "http://127.0.0.1:5171"
-			case "dev":
-				url = "https://grasp-daas.com/api/entitlements/v1/groups/"
-			}
-
-			req, err := http.NewRequest(http.MethodGet, url, nil)
+			req, err := http.NewRequest(http.MethodGet, p.Url, nil)
 			if err != nil {
 				return echo.NewHTTPError(http.StatusInternalServerError, err)
 			}

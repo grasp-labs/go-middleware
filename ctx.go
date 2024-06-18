@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
@@ -10,38 +11,31 @@ import (
 
 type Context struct {
 	echo.Context
-	IsGlobalAdminUser bool      `json:"is_global_admin_user"`
-	IsCustomerAdmin   bool      `json:"is_customer_admin"`
-	UserID            string    `json:"user_id"`
-	TenantName        string    `json:"tenant_name"`
-	TenantID          uuid.UUID `json:"tenant_id"`
-	AppID             uuid.UUID `json:"app_id"`
-	RequestID         uuid.UUID `json:"request_id"`
+	Sub        string    `json:"sub"`
+	Aud        []string  `json:"aud"`
+	Rol        []string  `json:"rol"`
+	Cls        string    `json:"cls"`
+	Ver        string    `json:"ver"`
+	TenantName string    `json:"tenant_name"`
+	TenantID   uuid.UUID `json:"tenant_id"`
+	RequestID  uuid.UUID `json:"request_id"`
 }
 
-func (c *Context) SetDataFromUser(u *User) {
-	if u != nil {
-		c.IsGlobalAdminUser = u.GlobalAdmin
-		c.IsCustomerAdmin = u.CustomerAdmin
-		c.UserID = u.UserID
-		c.TenantID = u.TenantID
-		c.TenantName = u.TenantName
-	}
-}
-
-func (c *Context) SetDataFromApp(a *App) {
-	if a != nil {
-		c.IsGlobalAdminUser = false
-		c.IsCustomerAdmin = false
-		c.UserID = a.User
-		c.TenantID = a.TenantID
-		c.TenantName = a.TenantName
-		c.AppID = a.ClientID
+func (c *Context) SetDataFromClaims(a JWTClaims) {
+	c.Sub = a.Sub
+	c.Aud = a.Aud
+	c.Rol = a.Rol
+	c.Cls = a.Cls
+	c.Ver = a.Ver
+	parts := strings.Split(a.Rsc, ":")
+	if len(parts) == 2 {
+		c.TenantID = uuid.MustParse(parts[0])
+		c.TenantName = parts[1]
 	}
 }
 
 func (c *Context) UserAndTenantIsPresent() bool {
-	return c.TenantID != uuid.Nil && c.UserID != ""
+	return c.TenantID != uuid.Nil && c.Sub != ""
 }
 
 // NewCustomContextMiddleware creates a middleware that enriches the echo context with custom data
@@ -70,8 +64,7 @@ func NewCustomContextMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 			Context:   c,
 			RequestID: uuid.MustParse(reqID),
 		}
-		cc.SetDataFromUser(claims.User)
-		cc.SetDataFromApp(claims.App)
+		cc.SetDataFromClaims(*claims)
 
 		return next(cc)
 	}

@@ -70,7 +70,7 @@ func toMiddleware(dynamo dynamodb.ClientDynamoDB, table string) (echo.Middleware
 						ClientIP:    ip,
 						StatusCode:  cc.Response().Status,
 						TenantID:    cc.TenantID,
-						UserID:      cc.UserID,
+						UserID:      cc.Sub,
 						CreatedAt:   startTime,
 						ProcessTime: processTime,
 					}

@@ -13,24 +13,7 @@ import (
 )
 
 var (
-	clientID   = uuid.MustParse("b225b665-bfb7-42e6-a794-3c12f166e146")
-	userClaims = &JWTClaims{
-		User: &User{
-			GlobalAdmin:   true,
-			CustomerAdmin: true,
-			TenantName:    "Foo Tenant",
-			UserID:        "foo@user.bar",
-			TenantID:      tenantID,
-		},
-	}
-	appClaims = &JWTClaims{
-		App: &App{
-			TenantName: "Foo Tenant",
-			User:       "foo@user.bar",
-			ClientID:   clientID,
-			TenantID:   tenantID,
-		},
-	}
+	clientID = uuid.MustParse("b225b665-bfb7-42e6-a794-3c12f166e146")
 )
 
 func TestNewCustomContextMiddleware(t *testing.T) {
@@ -65,7 +48,10 @@ func TestNewCustomContextMiddleware(t *testing.T) {
 			name:      "ShouldFailOnGetRequestID",
 			requestID: "",
 			jwtToken: &jwt.Token{
-				Claims: userClaims,
+				Claims: &JWTClaims{
+					Sub: "mock-sub",
+					Iss: "mock-iss",
+				},
 			},
 			args: args{
 				assertion: func(c echo.Context) error {
@@ -77,7 +63,10 @@ func TestNewCustomContextMiddleware(t *testing.T) {
 		{
 			name: "ShouldCreateCustomContextApp",
 			jwtToken: &jwt.Token{
-				Claims: appClaims,
+				Claims: &JWTClaims{
+					Sub: "mock-sub",
+					Rsc: "b9db1d4a-4364-4452-a2df-fcd44f38a63b:mock-tenant-name",
+				},
 			},
 			requestID: requestID.String(),
 			args: args{
@@ -89,41 +78,10 @@ func TestNewCustomContextMiddleware(t *testing.T) {
 
 					cc.Context = nil // nil this. hard to mock, and it's not important
 					want := &Context{
-						IsGlobalAdminUser: false,
-						IsCustomerAdmin:   false,
-						UserID:            "foo@user.bar",
-						TenantName:        "Foo Tenant",
-						TenantID:          tenantID,
-						RequestID:         requestID,
-						AppID:             clientID,
-					}
-
-					assert.Equal(t, want, cc)
-					return nil
-				},
-			},
-		},
-		{
-			name:      "ShouldCreateCustomContextUser",
-			requestID: requestID.String(),
-			jwtToken: &jwt.Token{
-				Claims: userClaims,
-			},
-			args: args{
-				assertion: func(c echo.Context) error {
-					cc, ok := c.(*Context)
-					if !ok {
-						log.Fatalln("cannot cast context to custom context")
-					}
-
-					cc.Context = nil // nil this. hard to mock, and its not important
-					want := &Context{
-						IsGlobalAdminUser: true,
-						IsCustomerAdmin:   true,
-						UserID:            "foo@user.bar",
-						TenantName:        "Foo Tenant",
-						TenantID:          tenantID,
-						RequestID:         requestID,
+						TenantID:   uuid.MustParse("b9db1d4a-4364-4452-a2df-fcd44f38a63b"),
+						TenantName: "mock-tenant-name",
+						Sub:        "mock-sub",
+						RequestID:  requestID,
 					}
 
 					assert.Equal(t, want, cc)

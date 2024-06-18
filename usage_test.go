@@ -111,13 +111,10 @@ func TestUsageConfig_toMiddleware(t *testing.T) {
 			rec := httptest.NewRecorder()
 			ctx := e.NewContext(req, rec)
 			cc := &Context{
-				Context:           ctx,
-				IsGlobalAdminUser: true,
-				IsCustomerAdmin:   true,
-				UserID:            userID,
-				TenantName:        "foo_tenant",
-				TenantID:          tenantID,
-				RequestID:         requestID,
+				Context:    ctx,
+				TenantName: "foo_tenant",
+				TenantID:   tenantID,
+				RequestID:  requestID,
 			}
 
 			if err := h(tt.handler)(cc); err != nil {

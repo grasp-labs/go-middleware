@@ -6,37 +6,24 @@ import (
 	"os"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/google/uuid"
 	"github.com/grasp-labs/go-libs/aws/paramstore"
 	"github.com/labstack/echo/v4"
 )
 
-type User struct {
-	GlobalAdmin   bool      `json:"global_admin"`
-	CustomerAdmin bool      `json:"customer_admin"`
-	TenantName    string    `json:"tenant_name"`
-	UserID        string    `json:"user_id"`
-	TenantID      uuid.UUID `json:"tenant_id"`
-}
-
-type App struct {
-	TenantName string    `json:"tenant_name"`
-	User       string    `json:"user"`
-	ClientID   uuid.UUID `json:"client_id"`
-	TenantID   uuid.UUID `json:"tenant_id"`
-}
-
 type JWTClaims struct {
 	jwt.RegisteredClaims
-	User      *User  `json:"user"`
-	App       *App   `json:"app"`
-	Exp       int    `json:"exp"`
-	Iat       int    `json:"iat"`
-	UserID    int    `json:"user_id"`
-	TokenType string `json:"token_type"`
-	Jti       string `json:"jti"`
-	Iss       string `json:"iss"`
-	ExpiresIn string `json:"expires_in"`
+	Iss       string   `json:"iss"`
+	Sub       string   `json:"sub"`
+	Aud       []string `json:"aud"`
+	Iat       int      `json:"iat"`
+	Nbf       float32  `json:"nbf"`
+	Exp       int      `json:"exp"`
+	Jti       string   `json:"jti"`
+	Cls       string   `json:"cls"`
+	Ver       string   `json:"ver"`
+	Rol       []string `json:"rol"`
+	Rsc       string   `json:"rsc"`
+	TokenType string   `json:"token_type"`
 }
 
 const (

@@ -111,7 +111,7 @@ func TestDispatch(t *testing.T) {
 				Context:   ctx,
 				RequestID: requestID,
 				TenantID:  tenantID,
-				UserID:    userID,
+				Sub:       userID,
 			}
 			if err := h(tt.args.next)(cc); err != nil {
 				assert.EqualError(t, err, tt.wantErrMsg)

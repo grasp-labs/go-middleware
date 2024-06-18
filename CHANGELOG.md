@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.2 - 2024-06-18
+
+### New Features:
+- Supporting new version of token claims
+
+
 ## v1.1.1 - 2024-05-10
 
 ### Fixes

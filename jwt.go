@@ -12,13 +12,6 @@ import (
 
 type JWTClaims struct {
 	jwt.RegisteredClaims
-	Iss       string   `json:"iss"`
-	Sub       string   `json:"sub"`
-	Aud       []string `json:"aud"`
-	Iat       int      `json:"iat"`
-	Nbf       float32  `json:"nbf"`
-	Exp       int      `json:"exp"`
-	Jti       string   `json:"jti"`
 	Cls       string   `json:"cls"`
 	Ver       string   `json:"ver"`
 	Rol       []string `json:"rol"`

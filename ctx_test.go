@@ -49,8 +49,10 @@ func TestNewCustomContextMiddleware(t *testing.T) {
 			requestID: "",
 			jwtToken: &jwt.Token{
 				Claims: &JWTClaims{
-					Sub: "mock-sub",
-					Iss: "mock-iss",
+					RegisteredClaims: jwt.RegisteredClaims{
+						Subject: "mock-sub",
+						Issuer:  "mock-iss",
+					},
 				},
 			},
 			args: args{
@@ -64,7 +66,9 @@ func TestNewCustomContextMiddleware(t *testing.T) {
 			name: "ShouldCreateCustomContextApp",
 			jwtToken: &jwt.Token{
 				Claims: &JWTClaims{
-					Sub: "mock-sub",
+					RegisteredClaims: jwt.RegisteredClaims{
+						Subject: "mock-sub",
+					},
 					Rsc: "b9db1d4a-4364-4452-a2df-fcd44f38a63b:mock-tenant-name",
 				},
 			},

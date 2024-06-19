@@ -22,8 +22,7 @@ type Context struct {
 }
 
 func (c *Context) SetDataFromClaims(a JWTClaims) {
-	c.Sub = a.Sub
-	c.Aud = a.Aud
+	c.Sub = a.RegisteredClaims.Subject
 	c.Rol = a.Rol
 	c.Cls = a.Cls
 	c.Ver = a.Ver

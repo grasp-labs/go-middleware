@@ -64,9 +64,9 @@ func (c *UsageConfig) toMiddleware(sqsClient sqs.ClientSqs) (echo.MiddlewareFunc
 				return echo.NewHTTPError(http.StatusInternalServerError, fmt.Errorf("cannot cast context to custom context"))
 			}
 
-			startTime := time.Now()
+			startTime := time.Now().Format(time.RFC3339)
 			handlerError := next(cc)
-			processTime := time.Now()
+			processTime := time.Now().Format(time.RFC3339)
 
 			if cc.TenantID != uuid.Nil {
 				queueInput := map[string]types.MessageAttributeValue{
@@ -84,11 +84,11 @@ func (c *UsageConfig) toMiddleware(sqsClient sqs.ClientSqs) (echo.MiddlewareFunc
 					},
 					"start_timestamp": {
 						DataType:    aws.String("String"),
-						StringValue: aws.String(startTime.String()),
+						StringValue: aws.String(startTime),
 					},
 					"end_timestamp": {
 						DataType:    aws.String("String"),
-						StringValue: aws.String(processTime.String()),
+						StringValue: aws.String(processTime),
 					},
 					"workflow": {
 						DataType:    aws.String("String"),
